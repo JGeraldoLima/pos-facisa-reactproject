@@ -5,25 +5,45 @@ import {
   Text,
   TextInput,
   Button,
-  ListView
+  ListView,
+  TouchableHighlight
 } from 'react-native';
 
-export default class HomePage extends Component {
+export class HomePage extends Component {
+  static navigationOptions = ({navigation}) => {
+    const params = navigation.state.params || {};
+    return {
+      title: 'Home'
+    };
+  };
 
-  constructor(props) {
-    super(props);
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+  render() {
+    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1.name !== r2.name});
     this.state = {
-      dataSource: ds.cloneWithRows(['row 1', 'row 2', 'row 2', 'row 2', 'row 2', 'row 2',
-        'row 2', 'row 2', 'row 2']),
+      dataSource: ds.cloneWithRows([{
+        name: 'xpto',
+        latitude: 'adsad',
+        longitude: 'asdsadasd',
+        population: '123123'
+      },
+        {
+          name: 'bcvqw',
+          latitude: 'dsad',
+          longitude: 'asdasda',
+          population: '35345345'
+        },
+        {
+          name: 'vbvcbd',
+          latitude: 'sadas',
+          longitude: 'asdasda',
+          population: '87965'
+        }]),
       inputSearch: ''
     };
 
     this.onPressLearnMore = function () {
-    }
-  }
+    };
 
-  render() {
     return (
       <View style={styles.parentView}>
         <View style={styles.descriptionView}>
@@ -48,10 +68,15 @@ export default class HomePage extends Component {
         <View style={styles.listViewWrapper}>
           <ListView dataSource={this.state.dataSource}
                     renderRow={(rowData) =>
-                      <View style={styles.listItem}>
-                        <Text style={styles.listItemTitle}>{rowData}</Text>
-                        <Text>{'Population: 321321'}</Text>
-                      </View>}
+                      <TouchableHighlight
+                        onPress={() => this.props.navigation.navigate('Details',
+                          {cityData: rowData})}
+                        underlayColor="cyan">
+                        <View style={styles.listItem}>
+                          <Text style={styles.listItemTitle}>{rowData.name}</Text>
+                          <Text>{'Population: ' + rowData.name + ' habitants'}</Text>
+                        </View>
+                      </TouchableHighlight>}
                     renderSeparator={(sectionId, rowId) =>
                       <View key={rowId}
                             style={styles.separator}/>}
@@ -103,5 +128,5 @@ const styles = StyleSheet.create({
     flex: 1,
     height: StyleSheet.hairlineWidth,
     backgroundColor: '#8E8E8E',
-  },
+  }
 });
