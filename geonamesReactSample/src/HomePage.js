@@ -5,8 +5,9 @@ import {
   Text,
   TextInput,
   Button,
-  ListView,
-  TouchableHighlight
+  FlatList,
+  TouchableHighlight,
+  ActivityIndicator
 } from 'react-native';
 
 export class HomePage extends Component {
@@ -17,35 +18,39 @@ export class HomePage extends Component {
     };
   };
 
-  render() {
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1.name !== r2.name});
+  constructor(props) {
+    super(props);
     this.state = {
-      dataSource: ds.cloneWithRows([{
-        name: 'xpto',
-        latitude: 'adsad',
-        longitude: 'asdsadasd',
-        population: '123123'
-      },
-        {
-          name: 'bcvqw',
-          latitude: 'dsad',
-          longitude: 'asdasda',
-          population: '35345345'
-        },
-        {
-          name: 'vbvcbd',
-          latitude: 'sadas',
-          longitude: 'asdasda',
-          population: '87965'
-        }]),
-      inputSearch: ''
+      isLoading: false,
+      dataSource: [],
+      text: ''
     };
 
-    this.onPressLearnMore = function () {
-    };
+    this.onPressSearch = this.onPressSearch.bind(this);
+  }
 
+  onPressSearch = function () {
+    this.state.isLoading = true;
+    let API_URL = 'http://api.geonames.org/searchJSON?username=jgeraldo&country=';
+    return fetch(API_URL + this.state.text)
+      .then((response) => response.json())
+      .then((responseJson) => {
+        this.setState({
+          isLoading: false,
+          dataSource: responseJson.geonames,
+        }, function () {
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+
+  render() {
     return (
       <View style={styles.parentView}>
+        <ActivityIndicator size="small" color="#0000ff" animating={this.state.isLoading}/>
         <View style={styles.descriptionView}>
           <Text style={styles.descriptionText}>This a most populous country cities
             search ReactNative app. Just insert the code of the country you want to
@@ -54,11 +59,12 @@ export class HomePage extends Component {
 
         <View style={styles.searchInputView}>
           <TextInput
+            onChangeText={(text) => this.setState({text: text})} value={this.props.val}
             placeholder="Country code (ex.: 'BR' for Brazil)"
-            onChangeText={(text) => this.setState({text})}
           />
           <Button
-            onPress={this.onPressLearnMore}
+            onPress={this.onPressSearch}
+            disabled={this.state.isLoading}
             title="Search"
             color="#841584"
             accessibilityLabel="Search for cities information"
@@ -66,20 +72,17 @@ export class HomePage extends Component {
         </View>
 
         <View style={styles.listViewWrapper}>
-          <ListView dataSource={this.state.dataSource}
-                    renderRow={(rowData) =>
+          <FlatList data={this.state.dataSource}
+                    renderItem={(item) =>
                       <TouchableHighlight
                         onPress={() => this.props.navigation.navigate('Details',
-                          {cityData: rowData})}
+                          {cityData: item})}
                         underlayColor="cyan">
                         <View style={styles.listItem}>
-                          <Text style={styles.listItemTitle}>{rowData.name}</Text>
-                          <Text>{'Population: ' + rowData.name + ' habitants'}</Text>
+                          <Text style={styles.listItemTitle}>{item.item.name}</Text>
+                          <Text>{'Population: ' + item.item.population + ' habitants'}</Text>
                         </View>
                       </TouchableHighlight>}
-                    renderSeparator={(sectionId, rowId) =>
-                      <View key={rowId}
-                            style={styles.separator}/>}
           />
         </View>
       </View>

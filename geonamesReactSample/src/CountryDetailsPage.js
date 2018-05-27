@@ -17,8 +17,7 @@ export class CountryDetailsPage extends Component {
   render() {
     const {params} = this.props.navigation.state;
 
-    //TODO: uncomment
-    const cityData = params ? params.cityData : {
+    const cityData = params ? params.cityData.item : {
       name: '',
       latitude: '',
       longitude: '',
@@ -30,9 +29,9 @@ export class CountryDetailsPage extends Component {
         <Text style={styles.detailInfoTitle}>Name: <Text
           style={styles.detailInfoText}>{cityData.name}</Text></Text>
         <Text style={styles.detailInfoTitle}>Latitude: <Text
-          style={styles.detailInfoText}>{cityData.latitude}</Text></Text>
+          style={styles.detailInfoText}>{cityData.lat}</Text></Text>
         <Text style={styles.detailInfoTitle}>Longitude: <Text
-          style={styles.detailInfoText}>{cityData.longitude}</Text></Text>
+          style={styles.detailInfoText}>{cityData.lng}</Text></Text>
         <Text style={styles.detailInfoTitle}>Population: <Text
           style={styles.detailInfoText}>{cityData.population} habitants</Text></Text>
       </View>
